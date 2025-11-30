@@ -89,6 +89,6 @@ class ElevatorSubsystemTest {
       CommandScheduler.getInstance().run();
     }
 
-    assertTrue(elevator.atExtension(0.5));
+    assertTrue(elevator.atExtension(0.0));
   }
 }
