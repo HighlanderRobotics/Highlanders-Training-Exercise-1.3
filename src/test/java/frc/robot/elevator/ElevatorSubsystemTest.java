@@ -65,6 +65,44 @@ class ElevatorSubsystemTest {
   }
 
   @Test
+  void testSetExtensionMetersApproachFromBelow() {
+    // Verify initial conditions: elevator at zero
+    assertTrue(elevator.atExtension(0));
+
+    // Move to 0.5 to set up the test conditions
+    Command c = elevator.setExtensionMeters(() -> 0.5);
+    c.schedule();
+
+    // Some time passes...
+    for (int i = 0; i < 50; i++) {
+      CommandScheduler.getInstance().run();
+    }
+
+    // Verify that we arrived at 0.5
+    assertTrue(elevator.atExtension(0.5));
+
+    // Schedule the Command under test: setExtensionMeters()
+    Command d = elevator.setExtensionMeters(() -> 0.3);
+    d.schedule();
+
+    // Keep track of the minimum position observed
+    double minExtensionMeters = Double.MAX_VALUE;
+
+    // Some time passes...
+    for (int i = 0; i < 50; i++) {
+      CommandScheduler.getInstance().run();
+      minExtensionMeters = Math.min(minExtensionMeters, elevator.getExtensionMeters());
+    }
+
+    // On the way from 0.5 to 0.3, the elevator purposely overshot to something less than
+    // 0.3, in order to approach the target from below...
+    assertTrue(minExtensionMeters < 0.28);
+
+    // ...and then it returned to the target 0.3
+    assertTrue(elevator.atExtension(0.3));
+  }
+
+  @Test
   void testSetExtensionMetersZero() {
     // Verify initial conditions: elevator at zero
     assertTrue(elevator.atExtension(0));
